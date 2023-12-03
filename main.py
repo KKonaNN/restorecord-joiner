@@ -54,17 +54,14 @@ class Discord:
             'Content-Type': 'application/json',
         })
 
-    def join(self, user):
+    def join(self, user, again=False):
         userid = user.get('id')
         access_token = user.get('at')
-        if not userid or not access_token:
-            print(f'[{time.strftime("%H:%M:%S")}] {Fore.RED} {userid} Invalid user ! {Fore.RESET}')
-            ui.bad += 1
-            return
         response = self.session.put(f'https://discordapp.com/api/guilds/{self.guild}/members/{userid}', json={'access_token': access_token})
-        self.handle_response(response, userid)
+        self.handle_response(response, user, again)
 
-    def handle_response(self, response, userid):
+    def handle_response(self, response, user, again=False):
+        userid = user.get('id')
         if response.status_code == 201:
             print(f'[{time.strftime("%H:%M:%S")}] {Fore.GREEN} {userid} Joined guild ! {Fore.RESET}')
             ui.hits += 1
@@ -79,10 +76,31 @@ class Discord:
             ui.bad += 1
             os._exit(0)
         else:
-            print(f'[{time.strftime("%H:%M:%S")}] {Fore.RED} {userid} Failed to join guild ! {Fore.RESET}')
-            ui.bad += 1
+            if not again:
+                access_token = self.new_access_token(user.get('Refresh_token'))
+                user_dict = {'id': userid, 'at': access_token}
+                self.join(user_dict, True)
+            else:
+                print(f'[{time.strftime("%H:%M:%S")}] {Fore.RED} {userid} Failed to join guild ! {Fore.RESET}')
+                ui.bad += 1
         time.sleep(5)
-
+    
+    def new_access_token(self, refresh_token):
+        try:
+            response = requests.post('https://discordapp.com/api/v6/oauth2/token', data={
+                'client_id': '', #your client id
+                'client_secret': '', #your client secret
+                'grant_type': 'refresh_token',
+                'refresh_token': refresh_token,
+                'redirect_uri': 'http://localhost', #your redirect uri
+                'scope': 'identify guilds.join'
+            })
+            if response.status_code == 200:
+                return response.json()['access_token']
+            else:
+                return 'N/A'
+        except:
+            return 'N/A'
 
 if __name__ == '__main__':
     ui = UI()
@@ -93,5 +111,18 @@ if __name__ == '__main__':
     guild = input('Enter the guild id: ')
     discord = Discord(token, guild)
     for user in users:
-        user_dict = {'id': user['discord_Id'], 'at': user['Access_token']}
-        discord.join(user_dict)
+        userid = user.get('discord_Id') or user.get('user_Id')
+        access_token = user.get('Access_token') or user.get('Access')
+        refresh_token = user.get('Refresh_token') or user.get('Refresh')
+        if userid and access_token:
+            if access_token == 'unauthorized' and refresh_token:
+                access_token = discord.new_access_token(refresh_token)
+                if access_token == 'N/A':
+                    print(f'[{time.strftime("%H:%M:%S")}] {Fore.RED} {userid} Invalid Access token ! {Fore.RESET}')
+                    ui.bad += 1
+                    continue
+            user_dict = {'id': userid, 'at': access_token}
+            discord.join(user_dict)
+        else:
+            print(f'[{time.strftime("%H:%M:%S")}] {Fore.RED} {userid} Invalid user ! {Fore.RESET}')
+            ui.bad += 1
