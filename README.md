@@ -1,3 +1,7 @@
+<p>
+  <h1>Leave a ⭐ homie</h1>
+</p>
+
 <p align="center">
   <img src="https://img.shields.io/github/contributors/KKonaNN/restorecord-joiner.svg?style=for-the-badge"/>
   <img src="https://img.shields.io/github/forks/KKonaNN/restorecord-joiner.svg?style=for-the-badge"/>
