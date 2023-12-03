@@ -20,6 +20,25 @@
   </p>
 </div>
 
+
+---------------------------------------
+### 👇 How-to (you need a business plan)
+
+<ul>
+  <li>
+    Export like this<br>
+    <img src="https://github.com/KKonaNN/restorecord-joiner/assets/87090666/0a4e51a4-33f9-4525-8d0e-ff4ed8914e5a"/>
+  </li>
+  <li>
+    Enter the right path of your json on the python input
+  </li>
+  <li>
+    Fill with the correct bot token ( that the users authorized with )
+  </li>
+</ul>
+
+---------------------------------------
+
 ---------------------------------------
 ### 🛠 Setting-up
 
