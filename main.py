@@ -74,7 +74,7 @@ class Discord:
         elif response.status_code == 403:
             print(f'[{time.strftime("%H:%M:%S")}] {Fore.RED} {userid} Invalid token ! {Fore.RESET}')
             ui.bad += 1
-            os._exit(0)
+            #os._exit(0) commented this cuz the user could delete the bot permession from his acc 
         else:
             if not again:
                 access_token = self.new_access_token(user.get('Refresh_token'))
